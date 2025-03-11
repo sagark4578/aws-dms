@@ -1,3 +1,3 @@
 locals {
-  databases = ["account_management" ,"ad_launcher", "adminv2", "media_lib", "payment", "user"]
+  databases = ["db1" ,"db2", "db3"]
 }
