@@ -1,5 +1,5 @@
 resource "aws_dms_endpoint" "source" {
-  database_name = "account_management"
+  database_name = "var.env{database_name}"
   endpoint_id   = "${var.environment}-source-endpoint"
   endpoint_type = "source"
   engine_name   = "mariadb"
@@ -7,7 +7,7 @@ resource "aws_dms_endpoint" "source" {
   username      = data.terraform_remote_state.rds.outputs.postgres_rds_user_name
   password      = data.terraform_remote_state.rds.outputs.postgres_rds_password
   port          = data.terraform_remote_state.rds.outputs.postgres_port_new
-  database_name               = "account_management"
+  database_name               = "var.env{database_name}"
   endpoint_id                 = "${var.environment}-target-endpoint"
   endpoint_type               = "target"
   engine_name                 = "mariadb"
@@ -43,7 +43,7 @@ resource "aws_dms_endpoint" "source" {
 another commit 
 
 resource "aws_dms_endpoint" "source" {
-  database_name = "account_management"
+  database_name = "var.env{database_name}"
   endpoint_id   = "${var.environment}-source-endpoint"
   endpoint_type = "source"
   engine_name   = "aurora-postgresql"
@@ -58,7 +58,7 @@ resource "aws_dms_endpoint" "source" {
 }
 
 resource "aws_dms_endpoint" "target" {
-  database_name               = "account_management"
+  database_name               = "var.env{database_name}"
   endpoint_id                 = "${var.environment}-target-endpoint"
   endpoint_type               = "target"
   engine_name                 = "aurora-postgresql"
@@ -92,14 +92,14 @@ resource "aws_dms_endpoint" "target" {
 resource "aws_dms_replication_task" "aws_dms_replication_task" {
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.aws_dms_replication_instance.replication_instance_arn
-  replication_task_id       = "${var.environment}-account_management-migration-task"
+  replication_task_id       = "${var.environment}-var.env{database_name}-migration-task"
   replication_task_settings = file("task_settings.json")
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
   target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
   table_mappings            = "{\"rules\":[{\"rule-type\":\"selection\",\"rule-id\":\"1\",\"rule-name\":\"1\",\"object-locator\":{\"schema-name\":\"account_management\",\"table-name\":\"%\"},\"rule-action\":\"include\"}]}"
   start_replication_task    = false
   tags = {
-    Name = "${var.environment}-account_management-migration-task"
+    Name = "${var.environment}-var.env{database_name}-migration-task"
   }
   lifecycle {
     ignore_changes = [replication_task_settings]
